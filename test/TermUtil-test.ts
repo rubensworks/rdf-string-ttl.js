@@ -12,7 +12,7 @@ describe('TermUtil', () => {
     });
 
     it('should transform a named node', async () => {
-      return expect(TermUtil.termToString(namedNode('http://example.org'))).toEqual('http://example.org');
+      return expect(TermUtil.termToString(namedNode('http://example.org'))).toEqual('<http://example.org>');
     });
 
     it('should transform a blank node', async () => {
@@ -36,19 +36,19 @@ describe('TermUtil', () => {
     });
 
     it('should transform a literal with a datatype', async () => {
-      return expect(TermUtil.termToString(literal('abc', namedNode('http://ex')))).toEqual('"abc"^^http://ex');
+      return expect(TermUtil.termToString(literal('abc', namedNode('http://ex')))).toEqual('"abc"^^<http://ex>');
     });
 
     it('should be usable within a map operation on generic term types', async () => {
       const terms: RDF.Term[] = [ namedNode('http://example.org/a'), namedNode('http://example.org/b') ];
       const stringTerms: string[] = terms.map(TermUtil.termToString);
-      return expect(stringTerms).toEqual([ 'http://example.org/a', 'http://example.org/b' ]);
+      return expect(stringTerms).toEqual([ '<http://example.org/a>', '<http://example.org/b>' ]);
     });
 
     it('should be usable within a map operation on specific term types', async () => {
       const terms: RDF.NamedNode[] = [ namedNode('http://example.org/a'), namedNode('http://example.org/b') ];
       const stringTerms: string[] = terms.map(TermUtil.termToString);
-      return expect(stringTerms).toEqual([ 'http://example.org/a', 'http://example.org/b' ]);
+      return expect(stringTerms).toEqual([ '<http://example.org/a>', '<http://example.org/b>' ]);
     });
 
     it('should be usable within a map operation on null', async () => {
@@ -72,7 +72,7 @@ describe('TermUtil', () => {
     it('should be usable within a map operation on terms and undefined', async () => {
       const terms: (RDF.NamedNode | undefined)[] = [ namedNode('http://example.org/a'), undefined ];
       const stringTerms: (string | undefined)[] = terms.map(TermUtil.termToString);
-      return expect(stringTerms).toEqual([ 'http://example.org/a', undefined ]);
+      return expect(stringTerms).toEqual([ '<http://example.org/a>', undefined ]);
     });
   });
 
@@ -134,7 +134,7 @@ describe('TermUtil', () => {
     });
 
     it('should transform a named node', async () => {
-      return expect(TermUtil.stringToTerm('http://example.org')).toEqual(namedNode('http://example.org'));
+      return expect(TermUtil.stringToTerm('<http://example.org>')).toEqual(namedNode('http://example.org'));
     });
 
     describe('with a custom data factory', () => {
@@ -185,7 +185,7 @@ describe('TermUtil', () => {
       });
 
       it('should transform a named node', async () => {
-        return expect(TermUtil.stringToTerm('http://example.org', DataFactory))
+        return expect(TermUtil.stringToTerm('<http://example.org>', DataFactory))
           .toEqual(namedNode('http://example.org'));
       });
     });
@@ -195,8 +195,8 @@ describe('TermUtil', () => {
     it('should transform a string triple to a triple', async () => {
       return expect(TermUtil.stringQuadToQuad({
         object: '"literal"',
-        predicate: 'http://example.org/p',
-        subject: 'http://example.org',
+        predicate: '<http://example.org/p>',
+        subject: '<http://example.org>',
       }).equals(triple(
         namedNode('http://example.org'),
         namedNode('http://example.org/p'),
@@ -206,10 +206,10 @@ describe('TermUtil', () => {
 
     it('should transform a string quad to a quad', async () => {
       return expect(TermUtil.stringQuadToQuad({
-        graph: 'http://example.org/graph',
+        graph: '<http://example.org/graph>',
         object: '"literal"',
-        predicate: 'http://example.org/p',
-        subject: 'http://example.org',
+        predicate: '<http://example.org/p>',
+        subject: '<http://example.org>',
       }).equals(quad(
         namedNode('http://example.org'),
         namedNode('http://example.org/p'),
@@ -222,8 +222,8 @@ describe('TermUtil', () => {
       it('should transform a string triple to a triple', async () => {
         return expect(TermUtil.stringQuadToQuad({
           object: '"literal"',
-          predicate: 'http://example.org/p',
-          subject: 'http://example.org',
+          predicate: '<http://example.org/p>',
+          subject: '<http://example.org>',
         }, DataFactory).equals(triple(
           namedNode('http://example.org'),
           namedNode('http://example.org/p'),
@@ -233,10 +233,10 @@ describe('TermUtil', () => {
 
       it('should transform a string quad to a quad', async () => {
         return expect(TermUtil.stringQuadToQuad({
-          graph: 'http://example.org/graph',
+          graph: '<http://example.org/graph>',
           object: '"literal"',
-          predicate: 'http://example.org/p',
-          subject: 'http://example.org',
+          predicate: '<http://example.org/p>',
+          subject: '<http://example.org>',
         }, DataFactory).equals(quad(
           namedNode('http://example.org'),
           namedNode('http://example.org/p'),
@@ -256,8 +256,8 @@ describe('TermUtil', () => {
       ))).toEqual({
         graph: '',
         object: '"literal"',
-        predicate: 'http://example.org/p',
-        subject: 'http://example.org',
+        predicate: '<http://example.org/p>',
+        subject: '<http://example.org>',
       });
     });
 
@@ -268,10 +268,10 @@ describe('TermUtil', () => {
         literal('literal'),
         namedNode('http://example.org/graph'),
       ))).toEqual({
-        graph: 'http://example.org/graph',
+        graph: '<http://example.org/graph>',
         object: '"literal"',
-        predicate: 'http://example.org/p',
-        subject: 'http://example.org',
+        predicate: '<http://example.org/p>',
+        subject: '<http://example.org>',
       });
     });
   });

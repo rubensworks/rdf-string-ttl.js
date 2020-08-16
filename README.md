@@ -1,29 +1,30 @@
-# RDF String
+# RDF String Turtle
 
-[![Build Status](https://travis-ci.org/rubensworks/rdf-string.js.svg?branch=master)](https://travis-ci.org/rubensworks/rdf-string.js)
-[![Coverage Status](https://coveralls.io/repos/github/rubensworks/rdf-string.js/badge.svg?branch=master)](https://coveralls.io/github/rubensworks/rdf-string.js?branch=master)
-[![npm version](https://badge.fury.io/js/rdf-string.svg)](https://www.npmjs.com/package/rdf-string)
+[![Build Status](https://travis-ci.org/rubensworks/rdf-string-ttl.js.svg?branch=master)](https://travis-ci.org/rubensworks/rdf-string-ttl.js)
+[![Coverage Status](https://coveralls.io/repos/github/rubensworks/rdf-string-ttl.js/badge.svg?branch=master)](https://coveralls.io/github/rubensworks/rdf-string-ttl.js?branch=master)
+[![npm version](https://badge.fury.io/js/rdf-string-ttl.svg)](https://www.npmjs.com/package/rdf-string-ttl)
 
 This package contains utility functions to convert between the string-based
 and [RDFJS](https://github.com/rdfjs/representation-task-force/) representations of RDF terms, quads and triples.
 
+_This is a fork of [RDF String](https://github.com/rubensworks/rdf-string.js) that is adapted to make string representation compatible with Turtle/SPARQL syntax._
+
 This allows for convenient and compact interaction with RDF terms and quads,
 as they can be serialized as plain JSON.
 
-This string-based representation is based on the
-[*old* triple representation of N3.js](https://github.com/rdfjs/N3.js/tree/v0.11.0#triple-representation).
-Namely, quads are represented as follows:
+Quads are represented as follows:
 ```
 {
-  subject:   'http://example.org/cartoons#Tom',
-  predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
-  object:    'http://example.org/cartoons#Cat'
-  graph:     'http://example.org/myGraph'
+  subject:   '<http://example.org/cartoons#Tom>',
+  predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+  object:    '<http://example.org/cartoons#Cat>'
+  graph:     '<http://example.org/myGraph>'
 }
 ```
 Different terms types in quads are represented as follows:
-* **URLs, URIs and IRIs are simple strings**: `'http://example.org/cartoons#Tom'`
-* **Literals are represented as double quoted strings**: `'"Tom"'`, `'"Tom"@en-gb'`, `'"1"^^http://www.w3.org/2001/XMLSchema#integer'`
+* **URLs, URIs and IRIs are strings wrapper in `<>``**: `'<http://example.org/cartoons#Tom>'`
+* **Literals are represented as double quoted strings**: `'"Tom"'`, `'"Tom"@en-gb'`, `'"1"^^<http://www.w3.org/2001/XMLSchema#integer>'`
+* **Blank nodes are prefixed by `_:`**: `'_:blankNodeName'`
 * **Variables are prefixed by `?`**: `'?variableName'`
 
 ## Usage
@@ -31,7 +32,7 @@ Different terms types in quads are represented as follows:
 The following examples assume the following imports:
 ```javascript
 import * as RdfDataModel from "rdf-data-model";
-import * as RdfString from "rdf-string";
+import * as RdfString from "rdf-string-ttl";
 ```
 
 ### Term to string
@@ -39,7 +40,7 @@ import * as RdfString from "rdf-string";
 Convert an RDFJS term to the string-based representation.
 
 ```javascript
-// Prints http://example.org
+// Prints <http://example.org>
 console.log(RdfString.termToString(RdfDataModel.namedNode('http://example.org')));
 
 // Prints _:b1
@@ -51,7 +52,7 @@ console.log(RdfString.termToString(RdfDataModel.literal('abc')));
 // Prints "abc"@en-us
 console.log(RdfString.termToString(RdfDataModel.literal('abc', 'en-us')));
 
-// Prints "abc"^^http://example.org/
+// Prints "abc"^^<http://example.org/>
 console.log(RdfString.termToString(RdfDataModel.literal('abc', namedNode('http://example.org/'))));
 
 // Prints ?v1
@@ -69,7 +70,7 @@ _Optionally, a custom RDFJS DataFactory can be provided as second argument to cr
 
 ```javascript
 // Outputs a named node
-RdfString.stringToTerm('http://example.org');
+RdfString.stringToTerm('<http://example.org>');
 
 // Outputs a blank node
 RdfString.stringToTerm('_:b1');
@@ -81,7 +82,7 @@ RdfString.stringToTerm('"abc"');
 RdfString.stringToTerm('"abc"@en-us');
 
 // Outputs a literal with a datatype
-RdfString.stringToTerm('"abc"^^http://example.org/');
+RdfString.stringToTerm('"abc"^^<http://example.org/>');
 
 // Outputs a variable
 RdfString.stringToTerm('?v1');
@@ -95,7 +96,7 @@ RdfString.stringToTerm('');
 Convert an RDFJS quad to a string-based quad.
 
 ```javascript
-// Prints { subject: 'http://example.org', predicate: 'http://example.org', object: '"abc"', graph: '' }
+// Prints { subject: '<http://example.org>', predicate: '<http://example.org>', object: '"abc"', graph: '' }
 console.log(RdfString.quadToStringQuad(RdfDataModel.triple(
   namedNode('http://example.org'),
   namedNode('http://example.org'),
@@ -112,8 +113,8 @@ _Optionally, a custom RDFJS DataFactory can be provided as second argument to cr
 ```javascript
 // Outputs a quad
 RdfString.stringQuadToQuad({
-  subject: 'http://example.org',
-  predicate: 'http://example.org',
+  subject: '<http://example.org>',
+  predicate: '<http://example.org>',
   object: '"abc"',
   graph: '',
 });

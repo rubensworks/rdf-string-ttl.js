@@ -31,6 +31,10 @@ describe('TermUtil', () => {
       return expect(TermUtil.termToString(literal('abc'))).toEqual('"abc"');
     });
 
+    it('should transform a literal with quotes', async () => {
+      return expect(TermUtil.termToString(literal('a"b"c'))).toEqual('"a\\"b\\"c"');
+    });
+
     it('should transform a literal with a language', async () => {
       return expect(TermUtil.termToString(literal('abc', 'en'))).toEqual('"abc"@en');
     });
@@ -109,6 +113,10 @@ describe('TermUtil', () => {
 
     it('should transform a literal', async () => {
       return expect(TermUtil.stringToTerm('"abc"').equals(literal('abc'))).toBeTruthy();
+    });
+
+    it('should transform a literal with escaped quotes', async () => {
+      return expect(TermUtil.stringToTerm('"a\\"b\\"c"').equals(literal('a"b"c'))).toBeTruthy();
     });
 
     it('should transform a literal with a datatype', async () => {

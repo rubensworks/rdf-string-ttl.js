@@ -29,7 +29,7 @@ export function termToString<T extends RDF.Term | undefined | null>(term: T): T 
   case 'BlankNode': return <any> ('_:' + term.value);
   case 'Literal':
     const literalValue: RDF.Literal = <RDF.Literal> term;
-    return <any> ('"' + literalValue.value + '"' +
+    return <any> ('"' + literalValue.value.replace(/"/ug, '\\"') + '"' +
       (literalValue.datatype &&
       literalValue.datatype.value !== 'http://www.w3.org/2001/XMLSchema#string' &&
       literalValue.datatype.value !== 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' ?
@@ -46,11 +46,11 @@ export function termToString<T extends RDF.Term | undefined | null>(term: T): T 
  * @return {string} The literal value inside the '"'.
  */
 export function getLiteralValue(literalValue: string): string {
-  const match = /^"([^]*)"/.exec(literalValue);
+  const match = /^"([^]*)"((\^\^.*)|(@.*))?$/.exec(literalValue);
   if (!match) {
     throw new Error(literalValue + ' is not a literal');
   }
-  return match[1];
+  return match[1].replace(/\\"/ug, '"');
 }
 
 /**

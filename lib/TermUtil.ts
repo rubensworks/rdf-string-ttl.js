@@ -59,7 +59,7 @@ export function getLiteralValue(literalValue: string): string {
  * @return {string} The datatype of the literal.
  */
 export function getLiteralType(literalValue: string): string {
-  const match = /^"[^]*"(?:\^\^([^"]+)|(@)[^@"]+)?$/.exec(literalValue);
+  const match = /^"[^]*"(?:\^\^<([^"]+)>|(@)[^@"]+)?$/.exec(literalValue);
   if (!match) {
     throw new Error(literalValue + ' is not a literal');
   }
@@ -102,7 +102,11 @@ export function stringToTerm(value: string | undefined, dataFactory?: RDF.DataFa
     const language: string = getLiteralLanguage(value);
     const type: RDF.NamedNode = dataFactory.namedNode(getLiteralType(value));
     return dataFactory.literal(getLiteralValue(value), language || type);
-  default:  return dataFactory.namedNode(value.substring(1,value.length-1));
+  default:
+    if (value.charAt(0) !== '<' || value.charAt(value.length - 1) !== '>') {
+      throw new Error(`Detected invalid iri for named node (must be wrapped in <>): ${value}`);
+    }
+    return dataFactory.namedNode(value.substring(1, value.length-1));
   }
 }
 

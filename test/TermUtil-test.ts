@@ -112,12 +112,12 @@ describe('TermUtil', () => {
     });
 
     it('should transform a literal with a datatype', async () => {
-      return expect(TermUtil.stringToTerm('"abc"^^http://blabla')
+      return expect(TermUtil.stringToTerm('"abc"^^<http://blabla>')
         .equals(literal('abc', namedNode('http://blabla')))).toBeTruthy();
     });
 
     it('should transform a literal with a datatype incorrectly', async () => {
-      return expect(TermUtil.stringToTerm('"abc"^^http://blabla')
+      return expect(TermUtil.stringToTerm('"abc"^^<http://blabla>')
         .equals(literal('abc'))).toBeFalsy();
     });
 
@@ -135,6 +135,16 @@ describe('TermUtil', () => {
 
     it('should transform a named node', async () => {
       return expect(TermUtil.stringToTerm('<http://example.org>')).toEqual(namedNode('http://example.org'));
+    });
+
+    it('should error a named node without <', async () => {
+      return expect(() => TermUtil.stringToTerm('http://example.org>'))
+        .toThrow(new Error('Detected invalid iri for named node (must be wrapped in <>): http://example.org>'));
+    });
+
+    it('should error a named node without >', async () => {
+      return expect(() => TermUtil.stringToTerm('<http://example.org'))
+        .toThrow(new Error('Detected invalid iri for named node (must be wrapped in <>): <http://example.org'));
     });
 
     describe('with a custom data factory', () => {
@@ -163,12 +173,12 @@ describe('TermUtil', () => {
       it('should transform a literal with a datatype', async () => {
         const typedDataFactory: RDF.DataFactory<RDF.Quad> = DataFactory;
 
-        return expect(TermUtil.stringToTerm('"abc"^^http://blabla', typedDataFactory)
+        return expect(TermUtil.stringToTerm('"abc"^^<http://blabla>', typedDataFactory)
           .equals(literal('abc', namedNode('http://blabla')))).toBeTruthy();
       });
 
       it('should transform a literal with a datatype incorrectly', async () => {
-        return expect(TermUtil.stringToTerm('"abc"^^http://blabla', DataFactory)
+        return expect(TermUtil.stringToTerm('"abc"^^<http://blabla>', DataFactory)
           .equals(literal('abc'))).toBeFalsy();
       });
 

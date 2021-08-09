@@ -1,6 +1,6 @@
 # RDF String Turtle
 
-[![Build Status](https://travis-ci.org/rubensworks/rdf-string-ttl.js.svg?branch=master)](https://travis-ci.org/rubensworks/rdf-string-ttl.js)
+[![Build status](https://github.com/rubensworks/rdf-string-ttl.js/workflows/CI/badge.svg)](https://github.com/rubensworks/rdf-string-ttl.js/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/rubensworks/rdf-string-ttl.js/badge.svg?branch=master)](https://coveralls.io/github/rubensworks/rdf-string-ttl.js?branch=master)
 [![npm version](https://badge.fury.io/js/rdf-string-ttl.svg)](https://www.npmjs.com/package/rdf-string-ttl)
 

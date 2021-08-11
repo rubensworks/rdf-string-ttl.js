@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.2.0"></a>
+## [v1.2.0](https://github.com/rubensworks/rdf-string-ttl.js/compare/v1.1.0...v1.2.0) - 2021-08-11
+
+### Changed
+* [Migrate to @rdfjs/types](https://github.com/rubensworks/rdf-string-ttl.js/commit/3a3c31b63f075b8d71a587a295b6dd6f92cae254)
+
 <a name="v1.1.0"></a>
 ## [v1.1.0](https://github.com/rubensworks/rdf-string-ttl.js/compare/v1.5.0...v1.1.0) - 2020-09-15
 

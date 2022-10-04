@@ -23,13 +23,12 @@ const FACTORY = new DataFactory();
  */
 export function termToString<T extends RDF.Term | undefined | null>(term: T): T extends RDF.Term ? string : undefined {
   // TODO: remove nasty any casts when this TS bug has been fixed: https://github.com/microsoft/TypeScript/issues/26933
-  if (!term) {
+  if (!term)
     return <any> undefined;
-  }
   switch (term.termType) {
   case 'NamedNode': return <any> ('<' + term.value + '>');
   case 'BlankNode': return <any> ('_:' + term.value);
-  case 'Literal':
+  case 'Literal': {
     const literalValue: RDF.Literal = <RDF.Literal> term;
     return <any> ('"' + literalValue.value.replace(/"/ug, '\\"') + '"' +
       (literalValue.datatype &&
@@ -37,7 +36,8 @@ export function termToString<T extends RDF.Term | undefined | null>(term: T): T 
       literalValue.datatype.value !== 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' ?
         '^^<' + literalValue.datatype.value + '>' : '') +
       (literalValue.language ? '@' + literalValue.language : ''));
-  case 'Quad': return <any> `<<${termToString(term.subject)} ${termToString(term.predicate)} ${termToString(term.object)}${term.graph.termType === 'DefaultGraph' ? '' : ' ' + termToString(term.graph)}>>`;
+  }
+  case 'Quad': return <any> (`<<${termToString(term.subject)} ${termToString(term.predicate)} ${termToString(term.object)}${term.graph.termType === 'DefaultGraph' ? '' : ' ' + termToString(term.graph)}>>`);
   case 'Variable': return <any> ('?' + term.value);
   case 'DefaultGraph': return <any> term.value;
   }
@@ -101,17 +101,18 @@ export function stringToTerm(value: string | undefined, dataFactory?: RDF.DataFa
       throw new Error(`Missing 'variable()' method on the given DataFactory`);
     }
     return dataFactory.variable(value.substr(1));
-  case '"':
+  case '"': {
     const language: string = getLiteralLanguage(value);
     const type: RDF.NamedNode = dataFactory.namedNode(getLiteralType(value));
     return dataFactory.literal(getLiteralValue(value), language || type);
+  }
   case '<':
   default:
     if (value.startsWith('<<') && value.endsWith('>>')) {
       // Iterate character-by-character to detect spaces that are *not* wrapped in <<>>
       const terms = value.slice(2, -2);
       const stringTerms: string[] = [];
-      let ignoreTags: number = 0;
+      let ignoreTags = 0;
       let lastIndex = 0;
       for (let i = 0; i < terms.length; i++) {
         const char = terms[i];

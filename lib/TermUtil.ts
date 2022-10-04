@@ -26,8 +26,8 @@ export function termToString<T extends RDF.Term | undefined | null>(term: T): T 
   if (!term)
     return <any> undefined;
   switch (term.termType) {
-  case 'NamedNode': return <any> ('<' + escapeIRI(term.value) + '>');
-  case 'BlankNode': return <any> ('_:' + escapeIRI(term.value));
+  case 'NamedNode': return <any> ('<' + term.value + '>');
+  case 'BlankNode': return <any> ('_:' + term.value);
   case 'Literal': {
     const literalValue: RDF.Literal = <RDF.Literal> term;
     return <any> ('"' + literalValue.value.replace(/"/ug, '\\"') + '"' +

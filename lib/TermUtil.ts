@@ -26,11 +26,11 @@ export function termToString<T extends RDF.Term | undefined | null>(term: T): T 
   if (!term)
     return <any> undefined;
   switch (term.termType) {
-  case 'NamedNode': return <any> ('<' + term.value + '>');
+  case 'NamedNode': return <any> ('<' + escapeIRI(term.value) + '>');
   case 'BlankNode': return <any> ('_:' + term.value);
   case 'Literal': {
     const literalValue: RDF.Literal = <RDF.Literal> term;
-    return <any> ('"' + literalValue.value.replace(/"/ug, '\\"') + '"' +
+    return <any> ('"' + escapeStringRDF(literalValue.value) + '"' +
       (literalValue.datatype &&
       literalValue.datatype.value !== 'http://www.w3.org/2001/XMLSchema#string' &&
       literalValue.datatype.value !== 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' ?
@@ -186,6 +186,47 @@ export function stringQuadToQuad<Q extends RDF.BaseQuad = RDF.Quad>(stringQuad: 
     stringToTerm(stringQuad.object, dataFactory),
     stringToTerm(stringQuad.graph, dataFactory),
   );
+}
+
+function escapeIRI(iriValue: string): string {
+  return iriValue.replace(escapeAll, characterReplacer);
+}
+
+function escapeStringRDF(stringValue: string): string {
+  if (escape.test(stringValue))
+    stringValue = stringValue.replace(escapeAll, characterReplacer);
+  return stringValue;
+}
+
+// The following variables and function where taken from the amazing N3.js project.
+// See here: https://github.com/rdfjs/N3.js/blob/main/src/N3Writer.js#L11
+
+// Characters in literals that require escaping
+const escape = /["\\\t\n\r\b\f\u0000-\u0019\ud800-\udbff]/;
+const escapeAll = /["\\\t\n\r\b\f\u0000-\u0019]|[\ud800-\udbff][\udc00-\udfff]/g;
+const escapedCharacters: { [id: string]: string } = {
+  '\\': '\\\\', '"': '\\"', '\t': '\\t',
+  '\n': '\\n', '\r': '\\r', '\b': '\\b', '\f': '\\f',
+};
+
+// Replaces a character by its escaped version
+function characterReplacer(character: string): string {
+  // Replace a single character by its escaped version
+  let result = escapedCharacters[character];
+  if (result === undefined) {
+    // Replace a single character with its 4-bit unicode escape sequence
+    if (character.length === 1) {
+      result = character.charCodeAt(0).toString(16);
+      result = '\\u0000'.substr(0, 6 - result.length) + result;
+    }
+    // Replace a surrogate pair with its 8-bit unicode escape sequence
+    else {
+      result = ((character.charCodeAt(0) - 0xD800) * 0x400 +
+                 character.charCodeAt(1) + 0x2400).toString(16);
+      result = '\\U00000000'.substr(0, 10 - result.length) + result;
+    }
+  }
+  return result;
 }
 
 export interface IStringQuad {

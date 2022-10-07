@@ -26,7 +26,7 @@ export function termToString<T extends RDF.Term | undefined | null>(term: T): T 
   if (!term)
     return <any> undefined;
   switch (term.termType) {
-  case 'NamedNode': return <any> ('<' + escapeIRI(term.value) + '>');
+  case 'NamedNode': return <any> ('<' + term.value + '>');
   case 'BlankNode': return <any> ('_:' + term.value);
   case 'Literal': {
     const literalValue: RDF.Literal = <RDF.Literal> term;
@@ -188,45 +188,25 @@ export function stringQuadToQuad<Q extends RDF.BaseQuad = RDF.Quad>(stringQuad: 
   );
 }
 
-function escapeIRI(iriValue: string): string {
-  return iriValue.replace(escapeAll, characterReplacer);
-}
+// These functions escape illegal characters in strings according to:
+// https://www.w3.org/TR/turtle/#h3_literals
+const stringReplacers: { (s: string): string  }[] = [
+  (s: string) => s.replace(/\\/g, '\\\\'),
+  (s: string) => s.replace(/"/g, '\\"'),
+  (s: string) => s.replace(/\n/g, '\\n'),
+  (s: string) => s.replace(/\r/g, '\\r'),
+];
 
+/**
+ * Escapes all characters that would be illegal in the double-quoted string representation for Turtle/N-Triples literal values.
+ * @param {string} stringValue - String that potentially needs escaping.
+ * @returns {string} String with all illegal characters escaped.
+ */
 function escapeStringRDF(stringValue: string): string {
-  if (escape.test(stringValue))
-    stringValue = stringValue.replace(escapeAll, characterReplacer);
-  return stringValue;
-}
-
-// The following variables and function where taken from the amazing N3.js project.
-// See here: https://github.com/rdfjs/N3.js/blob/main/src/N3Writer.js#L11
-
-// Characters in literals that require escaping
-const escape = /["\\\t\n\r\b\f\u0000-\u0019\ud800-\udbff]/;
-const escapeAll = /["\\\t\n\r\b\f\u0000-\u0019]|[\ud800-\udbff][\udc00-\udfff]/g;
-const escapedCharacters: { [id: string]: string } = {
-  '\\': '\\\\', '"': '\\"', '\t': '\\t',
-  '\n': '\\n', '\r': '\\r', '\b': '\\b', '\f': '\\f',
-};
-
-// Replaces a character by its escaped version
-function characterReplacer(character: string): string {
-  // Replace a single character by its escaped version
-  let result = escapedCharacters[character];
-  if (result === undefined) {
-    // Replace a single character with its 4-bit unicode escape sequence
-    if (character.length === 1) {
-      result = character.charCodeAt(0).toString(16);
-      result = '\\u0000'.substr(0, 6 - result.length) + result;
-    }
-    // Replace a surrogate pair with its 8-bit unicode escape sequence
-    else {
-      result = ((character.charCodeAt(0) - 0xD800) * 0x400 +
-                 character.charCodeAt(1) + 0x2400).toString(16);
-      result = '\\U00000000'.substr(0, 10 - result.length) + result;
-    }
-  }
-  return result;
+  return stringReplacers.reduce(
+    (intermediate, replacer) => replacer(intermediate),
+    stringValue
+  );
 }
 
 export interface IStringQuad {

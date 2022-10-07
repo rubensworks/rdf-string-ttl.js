@@ -1,5 +1,5 @@
-import { DataFactory } from "rdf-data-factory";
-import * as RDF from "@rdfjs/types";
+import type * as RDF from '@rdfjs/types';
+import { DataFactory } from 'rdf-data-factory';
 
 const FACTORY = new DataFactory();
 
@@ -8,9 +8,9 @@ const FACTORY = new DataFactory();
  *
  * RDF Terms are represented as follows:
  * * Blank nodes: '_:myBlankNode'
- * * Variables:   '_myVariable'
- * * Literals:    '"myString"', '"myLanguageString"@en-us', '"<p>e</p>"^^<http://www.w3.org/1999/02/22-rdf-syntax-ns#HTML>'
- * * URIs:        '<http://example.org>'
+ * * Variables: '_myVariable'
+ * * Literals: '"myString"', '"myLanguageString"@en-us', '"<p>e</p>"^^<http://www.w3.org/1999/02/22-rdf-syntax-ns#HTML>'
+ * * URIs: '<http://example.org>'
  *
  * Quads/triples are represented as hashes with 'subject', 'predicate', 'object' and 'graph' (optional)
  * as keys, and string-based RDF terms as values.
@@ -23,23 +23,25 @@ const FACTORY = new DataFactory();
  */
 export function termToString<T extends RDF.Term | undefined | null>(term: T): T extends RDF.Term ? string : undefined {
   // TODO: remove nasty any casts when this TS bug has been fixed: https://github.com/microsoft/TypeScript/issues/26933
-  if (!term)
+  if (!term) {
     return <any> undefined;
-  switch (term.termType) {
-  case 'NamedNode': return <any> ('<' + term.value + '>');
-  case 'BlankNode': return <any> ('_:' + term.value);
-  case 'Literal': {
-    const literalValue: RDF.Literal = <RDF.Literal> term;
-    return <any> ('"' + literalValue.value.replace(/"/ug, '\\"') + '"' +
-      (literalValue.datatype &&
-      literalValue.datatype.value !== 'http://www.w3.org/2001/XMLSchema#string' &&
-      literalValue.datatype.value !== 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' ?
-        '^^<' + literalValue.datatype.value + '>' : '') +
-      (literalValue.language ? '@' + literalValue.language : ''));
   }
-  case 'Quad': return <any> (`<<${termToString(term.subject)} ${termToString(term.predicate)} ${termToString(term.object)}${term.graph.termType === 'DefaultGraph' ? '' : ' ' + termToString(term.graph)}>>`);
-  case 'Variable': return <any> ('?' + term.value);
-  case 'DefaultGraph': return <any> term.value;
+  switch (term.termType) {
+    case 'NamedNode': return <any> (`<${term.value}>`);
+    case 'BlankNode': return <any> (`_:${term.value}`);
+    case 'Literal': {
+      const literalValue: RDF.Literal = term;
+      return <any> (`"${literalValue.value.replace(/"/ug, '\\"')}"${
+        literalValue.datatype &&
+        literalValue.datatype.value !== 'http://www.w3.org/2001/XMLSchema#string' &&
+        literalValue.datatype.value !== 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' ?
+          `^^<${literalValue.datatype.value}>` :
+          ''
+      }${literalValue.language ? `@${literalValue.language}` : ''}`);
+    }
+    case 'Quad': return <any> (`<<${termToString(term.subject)} ${termToString(term.predicate)} ${termToString(term.object)}${term.graph.termType === 'DefaultGraph' ? '' : ` ${termToString(term.graph)}`}>>`);
+    case 'Variable': return <any> (`?${term.value}`);
+    case 'DefaultGraph': return <any> term.value;
   }
 }
 
@@ -49,9 +51,9 @@ export function termToString<T extends RDF.Term | undefined | null>(term: T): T 
  * @return {string} The literal value inside the '"'.
  */
 export function getLiteralValue(literalValue: string): string {
-  const match = /^"([^]*)"((\^\^.*)|(@.*))?$/.exec(literalValue);
+  const match = /^"([^]*)"((\^\^.*)|(@.*))?$/u.exec(literalValue);
   if (!match) {
-    throw new Error(literalValue + ' is not a literal');
+    throw new Error(`${literalValue} is not a literal`);
   }
   return match[1].replace(/\\"/ug, '"');
 }
@@ -62,12 +64,13 @@ export function getLiteralValue(literalValue: string): string {
  * @return {string} The datatype of the literal.
  */
 export function getLiteralType(literalValue: string): string {
-  const match = /^"[^]*"(?:\^\^<([^"]+)>|(@)[^@"]+)?$/.exec(literalValue);
+  const match = /^"[^]*"(?:\^\^<([^"]+)>|(@)[^@"]+)?$/u.exec(literalValue);
   if (!match) {
-    throw new Error(literalValue + ' is not a literal');
+    throw new Error(`${literalValue} is not a literal`);
   }
-  return match[1] || (match[2]
-    ? 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' : 'http://www.w3.org/2001/XMLSchema#string');
+  return match[1] || (match[2] ?
+    'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' :
+    'http://www.w3.org/2001/XMLSchema#string');
 }
 
 /**
@@ -76,9 +79,9 @@ export function getLiteralType(literalValue: string): string {
  * @return {string} The language of the literal.
  */
 export function getLiteralLanguage(literalValue: string): string {
-  const match = /^"[^]*"(?:@([^@"]+)|\^\^[^"]+)?$/.exec(literalValue);
+  const match = /^"[^]*"(?:@([^@"]+)|\^\^[^"]+)?$/u.exec(literalValue);
   if (!match) {
-    throw new Error(literalValue + ' is not a literal');
+    throw new Error(`${literalValue} is not a literal`);
   }
   return match[1] ? match[1].toLowerCase() : '';
 }
@@ -91,65 +94,67 @@ export function getLiteralLanguage(literalValue: string): string {
  */
 export function stringToTerm(value: string | undefined, dataFactory?: RDF.DataFactory<RDF.BaseQuad>): RDF.Term {
   dataFactory = dataFactory || FACTORY;
-  if (!value || !value.length) {
+  if (!value || (value.length === 0)) {
     return dataFactory.defaultGraph();
   }
   switch (value[0]) {
-  case '_': return dataFactory.blankNode(value.substr(2));
-  case '?':
-    if (!dataFactory.variable) {
-      throw new Error(`Missing 'variable()' method on the given DataFactory`);
+    case '_': return dataFactory.blankNode(value.slice(2));
+    case '?':
+      if (!dataFactory.variable) {
+        throw new Error(`Missing 'variable()' method on the given DataFactory`);
+      }
+      return dataFactory.variable(value.slice(1));
+    case '"': {
+      const language: string = getLiteralLanguage(value);
+      const type: RDF.NamedNode = dataFactory.namedNode(getLiteralType(value));
+      return dataFactory.literal(getLiteralValue(value), language || type);
     }
-    return dataFactory.variable(value.substr(1));
-  case '"': {
-    const language: string = getLiteralLanguage(value);
-    const type: RDF.NamedNode = dataFactory.namedNode(getLiteralType(value));
-    return dataFactory.literal(getLiteralValue(value), language || type);
-  }
-  case '<':
-  default:
-    if (value.startsWith('<<') && value.endsWith('>>')) {
-      // Iterate character-by-character to detect spaces that are *not* wrapped in <<>>
-      const terms = value.slice(2, -2);
-      const stringTerms: string[] = [];
-      let ignoreTags = 0;
-      let lastIndex = 0;
-      for (let i = 0; i < terms.length; i++) {
-        const char = terms[i];
-        if (char === '<') ignoreTags++;
-        if (char === '>') {
-          if (ignoreTags === 0) {
-            throw new Error('Found closing tag without opening tag in ' + value);
-          } else {
-            ignoreTags--
+    case '<':
+    default:
+      if (value.startsWith('<<') && value.endsWith('>>')) {
+        // Iterate character-by-character to detect spaces that are *not* wrapped in <<>>
+        const terms = value.slice(2, -2);
+        const stringTerms: string[] = [];
+        let ignoreTags = 0;
+        let lastIndex = 0;
+        for (let i = 0; i < terms.length; i++) {
+          const char = terms[i];
+          if (char === '<') {
+            ignoreTags++;
+          }
+          if (char === '>') {
+            if (ignoreTags === 0) {
+              throw new Error(`Found closing tag without opening tag in ${value}`);
+            } else {
+              ignoreTags--;
+            }
+          }
+          if (char === ' ' && ignoreTags === 0) {
+            stringTerms.push(terms.slice(lastIndex, i));
+            lastIndex = i + 1;
           }
         }
-        if (char === ' ' && ignoreTags === 0) {
-          stringTerms.push(terms.slice(lastIndex, i));
-          lastIndex = i + 1;
+        if (ignoreTags !== 0) {
+          throw new Error(`Found opening tag without closing tag in ${value}`);
         }
-      }
-      if (ignoreTags !== 0) {
-        throw new Error('Found opening tag without closing tag in ' + value);
-      }
-      stringTerms.push(terms.slice(lastIndex, terms.length));
+        stringTerms.push(terms.slice(lastIndex, terms.length));
 
-      // We require 3 or 4 components
-      if (stringTerms.length !== 3 && stringTerms.length !== 4) {
-        throw new Error('Nested quad syntax error ' + value);
-      }
+        // We require 3 or 4 components
+        if (stringTerms.length !== 3 && stringTerms.length !== 4) {
+          throw new Error(`Nested quad syntax error ${value}`);
+        }
 
-      return dataFactory.quad(
-        stringToTerm(stringTerms[0]),
-        stringToTerm(stringTerms[1]),
-        stringToTerm(stringTerms[2]),
-        stringTerms[3] ? stringToTerm(stringTerms[3]) : undefined,
-      );
-    }
-    if (value.charAt(0) !== '<' || value.charAt(value.length - 1) !== '>') {
-      throw new Error(`Detected invalid iri for named node (must be wrapped in <>): ${value}`);
-    }
-    return dataFactory.namedNode(value.substring(1, value.length-1));
+        return dataFactory.quad(
+          stringToTerm(stringTerms[0]),
+          stringToTerm(stringTerms[1]),
+          stringToTerm(stringTerms[2]),
+          stringTerms[3] ? stringToTerm(stringTerms[3]) : undefined,
+        );
+      }
+      if (!value.startsWith('<') || !value.endsWith('>')) {
+        throw new Error(`Detected invalid iri for named node (must be wrapped in <>): ${value}`);
+      }
+      return dataFactory.namedNode(value.slice(1, -1));
   }
 }
 
@@ -159,15 +164,13 @@ export function stringToTerm(value: string | undefined, dataFactory?: RDF.DataFa
  * @return {IStringQuad} A hash with string-based quad terms.
  * @template Q The type of quad, defaults to RDF.Quad.
  */
-export function quadToStringQuad<Q extends RDF.BaseQuad = RDF.Quad>(q: Q): IStringQuad {
-  // tslint:disable:object-literal-sort-keys
+export function quadToStringQuad<Q extends RDF.BaseQuad = RDF.Quad>(quad: Q): IStringQuad {
   return {
-    subject: termToString(q.subject),
-    predicate: termToString(q.predicate),
-    object: termToString(q.object),
-    graph: termToString(q.graph),
+    subject: termToString(quad.subject),
+    predicate: termToString(quad.predicate),
+    object: termToString(quad.object),
+    graph: termToString(quad.graph),
   };
-  // tslint:enable:object-literal-sort-keys
 }
 
 /**
@@ -177,9 +180,11 @@ export function quadToStringQuad<Q extends RDF.BaseQuad = RDF.Quad>(q: Q): IStri
  * @return {Q} An RDFJS quad.
  * @template Q The type of quad, defaults to RDF.Quad.
  */
-export function stringQuadToQuad<Q extends RDF.BaseQuad = RDF.Quad>(stringQuad: IStringQuad,
-                                                                    dataFactory?: RDF.DataFactory<Q>): Q {
-  dataFactory = <RDF.DataFactory<Q>> dataFactory || FACTORY;
+export function stringQuadToQuad<Q extends RDF.BaseQuad = RDF.Quad>(
+  stringQuad: IStringQuad,
+  dataFactory?: RDF.DataFactory<Q>,
+): Q {
+  dataFactory = dataFactory! || FACTORY;
   return dataFactory.quad(
     stringToTerm(stringQuad.subject, dataFactory),
     stringToTerm(stringQuad.predicate, dataFactory),

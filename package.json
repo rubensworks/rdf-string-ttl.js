@@ -86,8 +86,5 @@
     "validate": "npm ls",
     "prepare": "npm run build",
     "version": "manual-git-changelog onversion"
-  },
-  "resolutions": {
-    "@types/rdf-js": "4.0.1"
   }
 }

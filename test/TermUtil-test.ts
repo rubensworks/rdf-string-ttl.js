@@ -48,36 +48,12 @@ describe('TermUtil', () => {
       return expect(TermUtil.termToString(FACTORY.literal('a\\bc'))).toEqual('"a\\\\bc"');
 	});
 
-	it('should transform a literal with a tab character', async () => {
-      return expect(TermUtil.termToString(FACTORY.literal('a\tbc'))).toEqual('"a\\tbc"');
-	});
-
 	it('should transform a literal with a newline character', async () => {
       return expect(TermUtil.termToString(FACTORY.literal('a\nbc'))).toEqual('"a\\nbc"');
 	});
 
 	it('should transform a literal with a cariage return character', async () => {
       return expect(TermUtil.termToString(FACTORY.literal('a\rbc'))).toEqual('"a\\rbc"');
-	});
-
-	it('should transform a literal with a backspace character', async () => {
-      return expect(TermUtil.termToString(FACTORY.literal('a\bbc'))).toEqual('"a\\bbc"');
-	});
-
-	it('should transform a literal with a form feed character', async () => {
-      return expect(TermUtil.termToString(FACTORY.literal('a\fbc'))).toEqual('"a\\fbc"');
-	});
-
-	it('should transform a literal with a line separator', async () => {
-      return expect(TermUtil.termToString(FACTORY.literal('a\u2028bc'))).toEqual('"a\u2028bc"');
-	});
-
-	it('should transform a literal with a paragraph separator', async () => {
-      return expect(TermUtil.termToString(FACTORY.literal('a\u2029bc'))).toEqual('"a\u2029bc"');
-	});
-
-	it('should transform a literal containing special unicode characters', async () => {
-      return expect(TermUtil.termToString(FACTORY.literal('a\u0000\u0001bc'))).toEqual('"a\\u0000\\u0001bc"');
 	});
 
     it('should transform a literal with a language', async () => {

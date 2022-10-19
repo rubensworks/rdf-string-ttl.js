@@ -80,6 +80,10 @@ describe('TermUtil', () => {
       return expect(TermUtil.termToString(FACTORY.literal('a\u0000\u0001bc'))).toEqual('"a\\u0000\\u0001bc"');
 	});
 
+  it('should transform a literal containing surrogate pairs', async () => {
+      return expect(TermUtil.termToString(FACTORY.literal('test 😀 test'))).toEqual('"test \\ud83d\\ude00 test"');
+  });
+
     it('should transform a literal with a language', async () => {
       return expect(TermUtil.termToString(FACTORY.literal('abc', 'en'))).toEqual('"abc"@en');
     });

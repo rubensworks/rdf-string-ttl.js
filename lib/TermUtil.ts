@@ -189,41 +189,43 @@ export function stringQuadToQuad<Q extends RDF.BaseQuad = RDF.Quad>(stringQuad: 
 }
 
 function escapeIRI(iriValue: string): string {
-  return iriValue.replace(escapeAll, characterReplacer);
+  return iriValue.replace(escapeAll, replaceEscapedCharacter);
 }
 
 function escapeStringRDF(stringValue: string): string {
   if (escape.test(stringValue))
-    stringValue = stringValue.replace(escapeAll, characterReplacer);
+    stringValue = stringValue.replace(escapeAll, replaceEscapedCharacter);
   return stringValue;
 }
 
-// The following variables and function where taken from the amazing N3.js project.
-// See here: https://github.com/rdfjs/N3.js/blob/main/src/N3Writer.js#L11
-
-// Characters in literals that require escaping
+// Characters in literals and IRIs that require escaping
 const escape = /["\\\t\n\r\b\f\u0000-\u0019\ud800-\udbff]/;
+// Also containing potential surrogate pairs
 const escapeAll = /["\\\t\n\r\b\f\u0000-\u0019]|[\ud800-\udbff][\udc00-\udfff]/g;
-const escapedCharacters: { [id: string]: string } = {
-  '\\': '\\\\', '"': '\\"', '\t': '\\t',
-  '\n': '\\n', '\r': '\\r', '\b': '\\b', '\f': '\\f',
-};
+const escapes = new Map([
+  ['\\', '\\\\'],
+  ['"',  '\\"'],
+  ['\t', '\\t'],
+  ['\n', '\\n'],
+  ['\r', '\\r'],
+  ['\b', '\\b'],
+  ['\f', '\\f'],
+]);
 
-// Replaces a character by its escaped version
-function characterReplacer(character: string): string {
-  // Replace a single character by its escaped version
-  let result = escapedCharacters[character];
-  if (result === undefined) {
-    // Replace a single character with its 4-bit unicode escape sequence
+function replaceEscapedCharacter(character: string): string {
+  // Try simples case first, get replacement for character
+  const result = escapes.get(character);
+  if (!result) {
     if (character.length === 1) {
-      result = character.charCodeAt(0).toString(16);
-      result = '\\u0000'.substr(0, 6 - result.length) + result;
+      // Single unicode charachters, i.e. not a surrogate pair
+      const code = character.charCodeAt(0).toString(16);
+      return `${'\\u0000'.slice(0, -code.length)}${code}`;
     }
-    // Replace a surrogate pair with its 8-bit unicode escape sequence
     else {
-      result = ((character.charCodeAt(0) - 0xD800) * 0x400 +
-                 character.charCodeAt(1) + 0x2400).toString(16);
-      result = '\\U00000000'.substr(0, 10 - result.length) + result;
+      // Surrogate pairs
+      const code1 = character.charCodeAt(0).toString(16);
+      const code2 = character.charCodeAt(1).toString(16);
+      return `${'\\u0000'.slice(0, -code1.length)}${code1}${'\\u0000'.slice(0, -code2.length)}${code2}`;
     }
   }
   return result;

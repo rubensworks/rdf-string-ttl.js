@@ -223,9 +223,8 @@ function replaceEscapedCharacter(character: string): string {
     }
     else {
       // Surrogate pairs
-      const code1 = character.charCodeAt(0).toString(16);
-      const code2 = character.charCodeAt(1).toString(16);
-      return `${'\\u0000'.slice(0, -code1.length)}${code1}${'\\u0000'.slice(0, -code2.length)}${code2}`;
+      const code = ((character.charCodeAt(0) - 0xD800) * 0x400 + character.charCodeAt(1) + 0x2400).toString(16);
+      return `${'\\U00000000'.slice(0, -code.length)}${code}`;
     }
   }
   return result;

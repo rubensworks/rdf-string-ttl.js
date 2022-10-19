@@ -81,7 +81,7 @@ describe('TermUtil', () => {
 	});
 
   it('should transform a literal containing surrogate pairs', async () => {
-      return expect(TermUtil.termToString(FACTORY.literal('test 😀 test'))).toEqual('"test \\ud83d\\ude00 test"');
+      return expect(TermUtil.termToString(FACTORY.literal('test 😀 test'))).toEqual('"test \\U0001f600 test"');
   });
 
     it('should transform a literal with a language', async () => {

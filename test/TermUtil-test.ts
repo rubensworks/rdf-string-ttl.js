@@ -21,6 +21,10 @@ describe('TermUtil', () => {
       expect(TermUtil.termToString(FACTORY.blankNode('b1'))).toEqual('_:b1');
     });
 
+    it('should transform a blank node with special characters without changing them', async() => {
+      expect(TermUtil.termToString(FACTORY.blankNode('a\uD835\uDC00test'))).toEqual('_:a\uD835\uDC00test');
+    });
+
     it('should transform a variable', async() => {
       expect(TermUtil.termToString(FACTORY.variable('v1'))).toEqual('?v1');
     });
@@ -35,6 +39,50 @@ describe('TermUtil', () => {
 
     it('should transform a literal with quotes', async() => {
       expect(TermUtil.termToString(FACTORY.literal('a"b"c'))).toEqual('"a\\"b\\"c"');
+    });
+
+    it('should transform a literal with single quotes', async() => {
+      expect(TermUtil.termToString(FACTORY.literal('a\'b\'c'))).toEqual('"a\'b\'c"');
+    });
+
+    it('should transform a literal with backslashes', async() => {
+      expect(TermUtil.termToString(FACTORY.literal('a\\bc'))).toEqual('"a\\\\bc"');
+    });
+
+    it('should transform a literal with a tab character', async() => {
+      expect(TermUtil.termToString(FACTORY.literal('a\tbc'))).toEqual('"a\\tbc"');
+    });
+
+    it('should transform a literal with a newline character', async() => {
+      expect(TermUtil.termToString(FACTORY.literal('a\nbc'))).toEqual('"a\\nbc"');
+    });
+
+    it('should transform a literal with a cariage return character', async() => {
+      expect(TermUtil.termToString(FACTORY.literal('a\rbc'))).toEqual('"a\\rbc"');
+    });
+
+    it('should transform a literal with a backspace character', async() => {
+      expect(TermUtil.termToString(FACTORY.literal('a\bbc'))).toEqual('"a\\bbc"');
+    });
+
+    it('should transform a literal with a form feed character', async() => {
+      expect(TermUtil.termToString(FACTORY.literal('a\fbc'))).toEqual('"a\\fbc"');
+    });
+
+    it('should transform a literal with a line separator', async() => {
+      expect(TermUtil.termToString(FACTORY.literal('a\u2028bc'))).toEqual('"a\u2028bc"');
+    });
+
+    it('should transform a literal with a paragraph separator', async() => {
+      expect(TermUtil.termToString(FACTORY.literal('a\u2029bc'))).toEqual('"a\u2029bc"');
+    });
+
+    it('should transform a literal containing special unicode characters', async() => {
+      expect(TermUtil.termToString(FACTORY.literal('a\u0000\u0001bc'))).toEqual('"a\\u0000\\u0001bc"');
+    });
+
+    it('should transform a literal containing surrogate pairs', async() => {
+      expect(TermUtil.termToString(FACTORY.literal('test 😀 test'))).toEqual('"test \\U0001f600 test"');
     });
 
     it('should transform a literal with a language', async() => {

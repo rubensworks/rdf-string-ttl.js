@@ -27,11 +27,11 @@ export function termToString<T extends RDF.Term | undefined | null>(term: T): T 
     return <any> undefined;
   }
   switch (term.termType) {
-    case 'NamedNode': return <any> (`<${term.value}>`);
+    case 'NamedNode': return <any> (`<${escapeIRI(term.value)}>`);
     case 'BlankNode': return <any> (`_:${term.value}`);
     case 'Literal': {
       const literalValue: RDF.Literal = term;
-      return <any> (`"${literalValue.value.replace(/"/ug, '\\"')}"${
+      return <any> (`"${escapeStringRDF(literalValue.value)}"${
         literalValue.datatype &&
         literalValue.datatype.value !== 'http://www.w3.org/2001/XMLSchema#string' &&
         literalValue.datatype.value !== 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' ?
@@ -191,6 +191,46 @@ export function stringQuadToQuad<Q extends RDF.BaseQuad = RDF.Quad>(
     stringToTerm(stringQuad.object, dataFactory),
     stringToTerm(stringQuad.graph, dataFactory),
   );
+}
+
+function escapeIRI(iriValue: string): string {
+  return iriValue.replace(escapePattern, replaceEscapedCharacter);
+}
+
+function escapeStringRDF(stringValue: string): string {
+  if (escapePattern.test(stringValue)) {
+    stringValue = stringValue.replace(escapePattern, replaceEscapedCharacter);
+  }
+  return stringValue;
+}
+
+// Characters in literals and IRIs that require escaping
+const escapePattern = /["\\\t\n\r\b\f\u0000-\u0019]|[\uD800-\uDBFF\uDC00-\uDFFF]/ug;
+// Also containing potential surrogate pairs
+const escapes = new Map([
+  [ '\\', '\\\\' ],
+  [ '"', '\\"' ],
+  [ '\t', '\\t' ],
+  [ '\n', '\\n' ],
+  [ '\r', '\\r' ],
+  [ '\b', '\\b' ],
+  [ '\f', '\\f' ],
+]);
+
+function replaceEscapedCharacter(character: string): string {
+  // Try simplest case first, get replacement for character
+  const result = escapes.get(character);
+  if (!result) {
+    if (character.length === 1) {
+      // Single unicode charachters, i.e. not a surrogate pair
+      const code = character.charCodeAt(0).toString(16);
+      return `${'\\u0000'.slice(0, -code.length)}${code}`;
+    }
+    // Surrogate pairs
+    const code = ((character.charCodeAt(0) - 0xD8_00) * 0x4_00 + character.charCodeAt(1) + 0x24_00).toString(16);
+    return `${'\\U00000000'.slice(0, -code.length)}${code}`;
+  }
+  return result;
 }
 
 export interface IStringQuad {

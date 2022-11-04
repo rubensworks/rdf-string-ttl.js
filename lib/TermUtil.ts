@@ -194,24 +194,19 @@ export function stringQuadToQuad<Q extends RDF.BaseQuad = RDF.Quad>(
 }
 
 function escapeIRI(iriValue: string): string {
-  return iriValue.replace(escapeAll, replaceEscapedCharacter);
+  return iriValue.replace(escapePattern, replaceEscapedCharacter);
 }
 
 function escapeStringRDF(stringValue: string): string {
-  if (escape.test(stringValue)) {
-    stringValue = stringValue.replace(escapeAll, replaceEscapedCharacter);
+  if (escapePattern.test(stringValue)) {
+    stringValue = stringValue.replace(escapePattern, replaceEscapedCharacter);
   }
   return stringValue;
 }
 
-/* eslint-disable require-unicode-regexp */
-/* eslint-disable unicorn/better-regex */
 // Characters in literals and IRIs that require escaping
-const escape = /["\\\t\n\r\b\f\u0000-\u0019\uD800-\uDBFF]/;
+const escapePattern = /["\\\t\n\r\b\f\u0000-\u0019]|[\uD800-\uDBFF\uDC00-\uDFFF]/ug;
 // Also containing potential surrogate pairs
-const escapeAll = /["\\\t\n\r\b\f\u0000-\u0019]|[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
-/* eslint-enable require-unicode-regexp */
-/* eslint-enable unicorn/better-regex */
 const escapes = new Map([
   [ '\\', '\\\\' ],
   [ '"', '\\"' ],
@@ -223,7 +218,7 @@ const escapes = new Map([
 ]);
 
 function replaceEscapedCharacter(character: string): string {
-  // Try simples case first, get replacement for character
+  // Try simplest case first, get replacement for character
   const result = escapes.get(character);
   if (!result) {
     if (character.length === 1) {

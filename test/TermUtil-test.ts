@@ -17,6 +17,11 @@ describe('TermUtil', () => {
       expect(TermUtil.termToString(FACTORY.namedNode('http://example.org'))).toEqual('<http://example.org>');
     });
 
+    it('should transform a named node with dashes', async() => {
+      expect(TermUtil.termToString(FACTORY.namedNode('http://this-is-an-example.com')))
+        .toEqual('<http://this-is-an-example.com>');
+    });
+
     it('should transform a blank node', async() => {
       expect(TermUtil.termToString(FACTORY.blankNode('b1'))).toEqual('_:b1');
     });

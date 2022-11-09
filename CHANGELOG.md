@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.3.1"></a>
+## [v1.3.1](https://github.com/rubensworks/rdf-string-ttl.js/compare/v1.3.0...v1.3.1) - 2022-11-09
+
+### Fixed
+* [Include source map files in packed files](https://github.com/rubensworks/rdf-string-ttl.js/commit/645dc97545a12100c61b235f7bcdb2ead92a0593)
+
 <a name="v1.3.0"></a>
 ## [v1.3.0](https://github.com/rubensworks/rdf-string-ttl.js/compare/v1.1.0...v1.3.0) - 2022-11-04
 

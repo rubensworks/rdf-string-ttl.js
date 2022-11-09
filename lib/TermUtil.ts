@@ -205,8 +205,10 @@ function escapeStringRDF(stringValue: string): string {
 }
 
 // Characters in literals and IRIs that require escaping
-const escapePattern = /["\\\t\n\r\b\f\u0000-\u0019]|[\uD800-\uDBFF\uDC00-\uDFFF]/ug;
 // Also containing potential surrogate pairs
+/* eslint-disable require-unicode-regexp */ /* eslint-disable unicorn/better-regex */
+const escapePattern = /["\\\t\n\r\b\f\u0000-\u0019]|[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
+/* eslint-enable require-unicode-regexp */ /* eslint-enable unicorn/better-regex */
 const escapes = new Map([
   [ '\\', '\\\\' ],
   [ '"', '\\"' ],

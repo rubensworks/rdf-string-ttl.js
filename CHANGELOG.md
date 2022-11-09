@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.3.2"></a>
+## [v1.3.2](https://github.com/rubensworks/rdf-string-ttl.js/compare/v1.3.1...v1.3.2) - 2022-11-09
+
+### Fixed
+* [Fix incorrect IRI escapes with dashes, Closes #5](https://github.com/rubensworks/rdf-string-ttl.js/commit/0924bebb8f555ad5c8a1069199b6428b4a464027)
+
 <a name="v1.3.1"></a>
 ## [v1.3.1](https://github.com/rubensworks/rdf-string-ttl.js/compare/v1.3.0...v1.3.1) - 2022-11-09
 

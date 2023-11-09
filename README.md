@@ -23,7 +23,7 @@ Quads are represented as follows:
 ```
 Different terms types in quads are represented as follows:
 * **URLs, URIs and IRIs are strings wrapper in `<>``**: `'<http://example.org/cartoons#Tom>'`
-* **Literals are represented as double quoted strings**: `'"Tom"'`, `'"Tom"@en-gb'`, `'"1"^^<http://www.w3.org/2001/XMLSchema#integer>'`
+* **Literals are represented as double quoted strings**: `'"Tom"'`, `'"Tom"@en-gb'`, `'"Tom"@en-gb--ltr'`, `'"1"^^<http://www.w3.org/2001/XMLSchema#integer>'`
 * **Blank nodes are prefixed by `_:`**: `'_:blankNodeName'`
 * **Variables are prefixed by `?`**: `'?variableName'`
 
@@ -51,6 +51,9 @@ console.log(RdfString.termToString(RdfDataModel.literal('abc')));
 
 // Prints "abc"@en-us
 console.log(RdfString.termToString(RdfDataModel.literal('abc', 'en-us')));
+
+// Prints "abc"@en-us--ltr
+console.log(RdfString.termToString(RdfDataModel.literal('abc', { language: 'en-us', direction: 'ltr' })));
 
 // Prints "abc"^^<http://example.org/>
 console.log(RdfString.termToString(RdfDataModel.literal('abc', namedNode('http://example.org/'))));
@@ -80,6 +83,9 @@ RdfString.stringToTerm('"abc"');
 
 // Outputs a literal with a language tag
 RdfString.stringToTerm('"abc"@en-us');
+
+// Outputs a literal with a language tag and direction
+RdfString.stringToTerm('"abc"@en-us--ltr');
 
 // Outputs a literal with a datatype
 RdfString.stringToTerm('"abc"^^<http://example.org/>');

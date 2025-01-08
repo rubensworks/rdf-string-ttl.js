@@ -1,6 +1,16 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.0.0"></a>
+## [v2.0.0](https://github.com/rubensworks/rdf-string-ttl.js/compare/v1.3.2...v2.0.0) - 2025-01-08
+
+### BREAKING CHANGES
+* [Update to rdf-data-factory v2](https://github.com/rubensworks/rdf-string-ttl.js/commit/eb630e9b1b34431a94b3a6479475191928cbff58)
+    This includes a bump to @rdfjs/types@2.0.0, which requires TypeScript 5 and Node 14+
+
+### Added
+* [Add support for base directions in literals](https://github.com/rubensworks/rdf-string-ttl.js/commit/e978fa87ee793e003f13525c43c8d25074b50a06)
+
 <a name="v1.3.2"></a>
 ## [v1.3.2](https://github.com/rubensworks/rdf-string-ttl.js/compare/v1.3.1...v1.3.2) - 2022-11-09
 

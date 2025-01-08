@@ -55,6 +55,7 @@ export function getLiteralValue(literalValue: string): string {
   if (!match) {
     throw new Error(`${literalValue} is not a literal`);
   }
+  // eslint-disable-next-line unicorn/prefer-string-replace-all
   return match[1].replace(/\\"/ug, '"');
 }
 

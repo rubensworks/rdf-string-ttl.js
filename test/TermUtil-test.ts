@@ -244,6 +244,8 @@ describe('TermUtil', () => {
         .equals(FACTORY.literal('abc', { language: 'en', direction: 'ltr' }))).toBeTruthy();
       expect(TermUtil.stringToTerm('"abc"@en-us--ltr')
         .equals(FACTORY.literal('abc', { language: 'en-us', direction: 'ltr' }))).toBeTruthy();
+      expect(TermUtil.stringToTerm('"---"@en-us--ltr')
+        .equals(FACTORY.literal('---', { language: 'en-us', direction: 'ltr' }))).toBeTruthy();
     });
 
     it('should transform a literal with a language and direction incorrectly', async() => {

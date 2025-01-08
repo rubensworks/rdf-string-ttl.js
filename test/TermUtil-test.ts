@@ -5,6 +5,12 @@ import * as TermUtil from '..';
 const FACTORY = new DataFactory();
 
 describe('TermUtil', () => {
+  describe('#getLiteralValue', () => {
+    it('should error on invalid literals', async() => {
+      expect(() => TermUtil.getLiteralValue('"abc')).toThrow();
+    });
+  });
+
   describe('#termToString', () => {
     it('should transform a falsy value', async() => {
       expect(TermUtil.termToString(null)).toBeFalsy();
@@ -68,6 +74,11 @@ describe('TermUtil', () => {
 
     it('should transform a literal with a backspace character', async() => {
       expect(TermUtil.termToString(FACTORY.literal('a\bbc'))).toEqual('"a\\bbc"');
+    });
+
+    it('should transform a literal with a language and direction', async() => {
+      expect(TermUtil.termToString(FACTORY.literal('abc', { language: 'en', direction: 'ltr' })))
+        .toEqual('"abc"@en--ltr');
     });
 
     it('should transform a literal with a form feed character', async() => {
@@ -171,12 +182,6 @@ describe('TermUtil', () => {
     });
   });
 
-  describe('#getLiteralValue', () => {
-    it('should error on invalid literals', async() => {
-      expect(() => TermUtil.getLiteralValue('"abc')).toThrow();
-    });
-  });
-
   describe('#getLiteralType', () => {
     it('should error on invalid literal types', async() => {
       expect(() => TermUtil.getLiteralType('"abc"h')).toThrow();
@@ -186,6 +191,12 @@ describe('TermUtil', () => {
   describe('#getLiteralLanguage', () => {
     it('should error on invalid languages', async() => {
       expect(() => TermUtil.getLiteralLanguage('"abc"@')).toThrow();
+    });
+  });
+
+  describe('#getLiteralDirection', () => {
+    it('should error on invalid directions', async() => {
+      expect(() => TermUtil.getLiteralDirection('"abc"@en--bla')).toThrow();
     });
   });
 
@@ -226,6 +237,20 @@ describe('TermUtil', () => {
 
     it('should transform a literal with a language incorrectly', async() => {
       expect(TermUtil.stringToTerm('"abc"@en').equals(FACTORY.literal('abc'))).toBeFalsy();
+    });
+
+    it('should transform a literal with a language and direction', async() => {
+      expect(TermUtil.stringToTerm('"abc"@en--ltr')
+        .equals(FACTORY.literal('abc', { language: 'en', direction: 'ltr' }))).toBeTruthy();
+      expect(TermUtil.stringToTerm('"abc"@en-us--ltr')
+        .equals(FACTORY.literal('abc', { language: 'en-us', direction: 'ltr' }))).toBeTruthy();
+    });
+
+    it('should transform a literal with a language and direction incorrectly', async() => {
+      expect(TermUtil.stringToTerm('"abc"@en--ltr')
+        .equals(FACTORY.literal('abc', { language: 'en', direction: 'rtl' }))).toBeFalsy();
+      expect(TermUtil.stringToTerm('"abc"@en-us--ltr')
+        .equals(FACTORY.literal('abc', { language: 'en-us', direction: 'rtl' }))).toBeFalsy();
     });
 
     it('should transform a default graph', async() => {

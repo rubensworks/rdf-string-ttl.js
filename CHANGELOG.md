@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.0.1"></a>
+## [v2.0.1](https://github.com/rubensworks/rdf-string-ttl.js/compare/v2.0.0...v2.0.1) - 2025-01-08
+
+### Fixed
+* [Fix direction parsing looking into literal value](https://github.com/rubensworks/rdf-string-ttl.js/commit/0e276aed3ad32c8f33ec44cf4dbfae57efa0602c)
+
 <a name="v2.0.0"></a>
 ## [v2.0.0](https://github.com/rubensworks/rdf-string-ttl.js/compare/v1.3.2...v2.0.0) - 2025-01-08
 

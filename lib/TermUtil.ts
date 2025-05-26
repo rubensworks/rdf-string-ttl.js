@@ -226,11 +226,11 @@ export function stringQuadToQuad<Q extends RDF.BaseQuad = RDF.Quad>(
   );
 }
 
-function escapeIRI(iriValue: string): string {
+export function escapeIRI(iriValue: string): string {
   return iriValue.replace(escapePattern, replaceEscapedCharacter);
 }
 
-function escapeStringRDF(stringValue: string): string {
+export function escapeStringRDF(stringValue: string): string {
   if (escapePattern.test(stringValue)) {
     stringValue = stringValue.replace(escapePattern, replaceEscapedCharacter);
   }

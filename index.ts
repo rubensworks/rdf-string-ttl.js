@@ -8,6 +8,8 @@ import {
   stringQuadToQuad,
   stringToTerm,
   termToString,
+  escapeIRI,
+  escapeStringRDF,
 } from './lib/TermUtil';
 export {
   getLiteralLanguage,
@@ -19,4 +21,6 @@ export {
   stringQuadToQuad,
   stringToTerm,
   termToString,
+  escapeIRI,
+  escapeStringRDF,
 };

@@ -9,6 +9,7 @@ import {
   stringToTerm,
   termToString,
   escapeIRI,
+  escapeStringRDF,
 } from './lib/TermUtil';
 export {
   getLiteralLanguage,
@@ -21,4 +22,5 @@ export {
   stringToTerm,
   termToString,
   escapeIRI,
+  escapeStringRDF,
 };

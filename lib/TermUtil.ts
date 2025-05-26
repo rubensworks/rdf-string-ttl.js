@@ -230,7 +230,7 @@ export function escapeIRI(iriValue: string): string {
   return iriValue.replace(escapePattern, replaceEscapedCharacter);
 }
 
-function escapeStringRDF(stringValue: string): string {
+export function escapeStringRDF(stringValue: string): string {
   if (escapePattern.test(stringValue)) {
     stringValue = stringValue.replace(escapePattern, replaceEscapedCharacter);
   }
